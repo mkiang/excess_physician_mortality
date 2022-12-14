@@ -11,37 +11,43 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Excess mortality among US physicians ages 45 to 84 years during the COVID-19 pandemic, March 2020 through December 2021
+## Excess mortality among US physicians during the COVID-19 pandemic
 
 <img src="./plots/figure1.jpg" width="750px" style="display: block; margin: auto;" />
 
-This repository, [`excess_physician_mortality`](https://github.com/mkiang/excess_physician_mortality), contains reproducible code for our open-access *JAMA Internal Medicine* research letter, ["Excess mortality among US physicians ages 45 to 84 years during the COVID-19 pandemic, March 2020 through December 2021"](TODO), which uses [data from the American Medical Association (AMA)](https://www.ama-assn.org/about/masterfile/ama-physician-masterfile) to estimate excess mortality among US physicians during the COVID-19 pandemic. 
+This repository, [`excess_physician_mortality`](https://github.com/mkiang/excess_physician_mortality), contains reproducible code for our open-access *JAMA Internal Medicine* research letter, ["Excess mortality among US physicians during the COVID-19 pandemic"](TODO), which uses [data from the American Medical Association (AMA)](https://www.ama-assn.org/about/masterfile/ama-physician-masterfile) to estimate [excess mortality](https://github.com/rafalab/excessmort) among US physicians during the COVID-19 pandemic. The full citation is:
 
-All code can be found in the `./code` folder and must be run in order. Numeric representation of our figures can be found in the `./output` folder. Figures are in the `./plots` folder. Tables are in the `./rmds` folder. Where applicable, the (shareable) raw data are in `./data_raw` and the (shareable) processed data are in the `./data` folder. 
+> Kiang MV, Carlasare LE, Thadaney Israni S, Norcini JJ, Zaman JAB, Bibbins-Domingo K. Excess mortality among US physicians during the COVID-19 pandemic. *JAMA Internal Medicine*. Published online February 6, 2023. doi:10.1001/jamainternmed.2022.6308.
+
+## About this repository
+
+All code can be found in the `./code` folder and must be run in order. The first few lines of each code file contains a brief description of the tasks related to that file. Numeric representation of our figures can be found in the `./output` folder. Figures are in the `./plots` folder. Tables are generated using `rmarkdown` and both source and output are in the `./rmds` folder. Where applicable, the (shareable) raw data are in `./data_raw` and the (shareable) processed data are in the `./data` folder. 
 
 ## Authors
--   [Mathew Kiang](https://mathewkiang.com)
+-   [Mathew V Kiang](https://mathewkiang.com)
     (![Github](http://i.imgur.com/9I6NRUm.png):
     [mkiang](https://github.com/mkiang) \|
     ![Twitter](http://i.imgur.com/wWzX9uB.png):
     [@mathewkiang](https://twitter.com/mathewkiang))
--   Lindsey Carlasare
+-   Lindsey E Carlasare
 -   [Sonoo Thadaney Israni ](https://profiles.stanford.edu/sonoo)
--   John Norcini
--   Junaid Zaman
+-   John J Norcini
+-   Junaid AB Zaman
 -   [Kirsten
     Bibbins-Domingo](https://profiles.ucsf.edu/kirsten.bibbins-domingo)
     (![Twitter](http://i.imgur.com/wWzX9uB.png):
     [@KBibbinsDomingo](https://twitter.com/KBibbinsDomingo))
     
 ## Conflicts of interest
-This study was not directly funded. LEC is employed by the American Medical Association (AMA). STI serves on the boards of UNICEF Northwestern Region, SCIENTS, and Society of Bedside Medicine in unpaid capacity. KBD is editor-in-chief of *JAMA* and the JAMA Network. MVK is supported by the National Institutes of Health for work outside the scope of this manuscript. No other conflicts to report. See the full manuscript for all acknowledgements, conflicts, and disclaimers. 
+This study was not directly funded. LEC is employed by the American Medical Association (AMA). STI serves on the boards of UNICEF Northwestern Region, SCIENTS, and Society of Bedside Medicine in an unpaid capacity. KBD is editor-in-chief of *JAMA* and the JAMA Network. MVK is supported by the National Institutes of Health for work outside the scope of this manuscript. No individuals received compensation outside of their usual salaries for their contributions to this work. No other conflicts to report. See the full manuscript for all acknowledgements, conflicts, and disclaimers. 
 
-The AMA, related institutions, and funders had no role in the design and conduct of the study, nor the decision to prepare and submit the manuscript for publication.
+The AMA, NIH, and other institutions listed above had no role in the design and conduct of the study, nor the decision to prepare and submit the manuscript for publication.
 
 ## Notes on Reproducibility
 
-Note, due to limitations in our data use agreement, **we cannot share physician data**. However, we provide reproducible code here such that researchers who have access to the [AMA Masterfile](https://www.ama-assn.org/about/masterfile/ama-physician-masterfile) and AMA Deceased Physician File can reproduce and extend our results. We use [`renv`](https://rstudio.github.io/renv/index.html) for package management but below we also post the relevant session information to ensure full reproducibility. 
+Note, due to limitations in our data use agreement, **we cannot share physician data** (see online Supplement 2). However, we provide reproducible code here such that researchers who have access to the [AMA Masterfile](https://www.ama-assn.org/about/masterfile/ama-physician-masterfile) and corresponding AMA Deceased Physician File can reproduce and extend our results. 
+
+We use [`renv`](https://rstudio.github.io/renv/index.html) for package management but below we also post the relevant session information to ensure full reproducibility. 
 
 ```{r, eval=FALSE}
 > sessioninfo::session_info()

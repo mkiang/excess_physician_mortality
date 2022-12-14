@@ -1,0 +1,36 @@
+---
+title: "AMA Mortality File Characteristics"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+## Imports ----
+library(tidyverse)
+library(here)
+source(here("code", "utils.R"))
+
+deaths_orig <- readRDS(here("data", "deaths_df_individual_level.RDS"))
+
+## Flag to those who are active ----
+deaths_df <- deaths_orig %>%
+  create_active_grp() %>% 
+  filter(year < 2022, year >= 2015)
+```
+
+## Total observations
+- From `r min(deaths_df$year)` to `r max(deaths_df$year)`, there were a total of `r NROW(deaths_df)` deaths.
+
+## By type of practice
+```{r}
+deaths_df %>% group_by(active_grp) %>% summarize(n_deaths = n())
+```
+
+## Restricting to 25-84 year olds
+
+```{r}
+deaths_df %>% filter(between(age, 25, 84)) %>% group_by(active_grp) %>% summarize(n_deaths = n())
+```
