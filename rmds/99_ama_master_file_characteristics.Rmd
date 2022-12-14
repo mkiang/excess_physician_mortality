@@ -1,0 +1,42 @@
+---
+title: "AMA Master File Characteristics"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+## Imports ----
+library(tidyverse)
+library(here)
+source(here("code", "utils.R"))
+
+counts_orig <- readRDS(here("data", "cleaned_ama_counts.RDS"))
+
+## Flag to those who are active ----
+counts_df <- counts_orig %>%
+  create_active_grp()
+```
+
+## Total observations
+- From `r min(counts_df$year)` to `r max(counts_df$year)`, there were a total of `r NROW(counts_df)` person-years of observation in the AMA Master File across `r n_distinct(counts_df$me_num)` unique physicians.
+
+## By type of practice
+```{r}
+counts_df %>% group_by(active_grp) %>% summarize(n_personyears = n(), n_providers = n_distinct(me_num))
+```
+
+
+- Across all years, there are `r sum(counts_df$active_grp == "active", na.rm = TRUE)` person-years of observations classified as "actively practicing" across `r counts_df %>% filter(active_grp == "active") %>% pull(me_num) %>% n_distinct()` unique physicians. 
+
+- Across all years, there are `r sum(counts_df$active_grp == "not_active", na.rm = TRUE)` person-years of observations classified as "non-actively practicing" across `r counts_df %>% filter(active_grp == "not_active") %>% pull(me_num) %>% n_distinct()` unique physicians. 
+## Restricting on age 
+```{r}
+counts_df %>% filter(between(age, 45, 84)) %>% group_by(active_grp) %>% summarize(n_personyears = n(), n_providers = n_distinct(me_num))
+```
+
+- Among these years, after restricting to actively-practicing physicians between 45 and 84 years of age, there are `r counts_df %>% filter(active_grp == "active") %>% filter(between(age, 45, 84)) %>% NROW()` person-years of observations classified as "actively practicing" across `r counts_df %>% filter(active_grp == "active") %>% filter(between(age, 45, 84)) %>% pull(me_num) %>% n_distinct()` unique physicians. 
+
+- Among these years, after restricting to non-actively-practicing physicians between 45 and 84 years of age, there are `r counts_df %>% filter(active_grp == "not_active") %>% filter(between(age, 45, 84)) %>% NROW()` person-years of observations classified as "not actively practicing" across `r counts_df %>% filter(active_grp == "not_active") %>% filter(between(age, 45, 84)) %>% pull(me_num) %>% n_distinct()` unique physicians. 

@@ -1,0 +1,339 @@
+---
+title: "Table 1. Observed, Expected, and Excess Mortality"
+author: "Mathew Kiang"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    code_folding: 'hide'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(error = FALSE)
+```
+
+## Set up
+
+```{r imports}
+library(tidyverse)
+library(here)
+library(knitr)
+library(kableExtra)
+library(DT)
+source(here("code", "utils.R"))
+
+## Data ----
+pop_df <- readRDS(here("data", "population_monthly.RDS")) %>%
+    filter(date >= as.Date("2020-03-01"),
+           date <= as.Date("2021-12-31"))
+
+death_df <- readRDS(here("data", "analytic_monthly.RDS")) %>%
+    filter(
+        date_start >= as.Date("2020-03-01"),
+        date_end <= as.Date("2021-12-31"), 
+        !is.na(age_grp),
+        age_grp != "all",
+        race_grp == "all",
+        img_grp == "all",
+        spec_grp == "all",
+        death_type == "all_cause"
+    ) %>%
+    arrange(race_grp, img_grp, spec_grp, death_type, age_grp, date_start) %>% 
+    group_by(age_grp, active_grp) %>%
+    summarize(
+        n_deaths = sum(n_deaths),
+        date = last(date_end),
+        month_from_start = last(month_from_start)
+    ) %>% 
+    ungroup()
+
+cume_df <- readRDS(here("data", "cume_excess_deaths_monthly.RDS")) %>%
+    filter(!is.na(age_grp),
+           age_grp != "all",
+           race_grp == "all",
+           img_grp == "all",
+           spec_grp == "all") %>%
+    select(-race_grp, -img_grp, -spec_grp, -observed) %>%
+    categorize_age() %>%
+    categorize_death() %>%
+    categorize_active() %>%
+    left_join(pop_df) %>%
+    as_tibble()
+
+## Gen pop ----
+genpop_df <- readRDS(here("data", "supp_analytic_weekly_usgenpop.RDS")) %>%
+    filter(date_start >= as.Date("2020-03-01"),
+           date_end <= as.Date("2021-12-31")) %>% 
+    rename(date = date_end) %>% 
+    mutate(active_grp = "genpop")
+
+genpop_death <- genpop_df %>%
+    filter(
+        !is.na(age_grp),
+        age_grp != "all",
+        death_type == "all_cause"
+    ) %>%
+    arrange(death_type, age_grp, date_start) %>% 
+    group_by(age_grp, active_grp) %>%
+    summarize(
+        n_deaths = sum(n_deaths),
+        date = last(date),
+        month_from_start = NA
+    ) %>% 
+    ungroup()
+
+genpop_cume <- readRDS(here("data", "supp_cume_excess_deaths_usgenpop.RDS")) %>%
+    mutate(active_grp = "genpop") %>% 
+    categorize_age() %>%
+    categorize_death() %>%
+    categorize_active() %>%
+    left_join(genpop_df) %>%
+    as_tibble() %>% 
+    filter(!is.na(age_cat)) 
+
+```
+
+## Summarize cumulative excess mortality
+
+```{r}
+## Summarize cumulative excess deaths ----
+## Take the monthly population count as our person-time at risk. Then the 
+## cumulative monthly population counts are our cumulative person-months at
+## risk and we can annualize it by scaling it 12 (months per year) over the 
+## number of months observed. 
+N_MONTHS <- n_distinct(cume_df$date)
+
+cume_summary <- cume_df %>%
+    group_by(death_type, age_grp, active_grp) %>%
+    arrange(death_type, age_cat, active_cat, date) %>%
+    mutate(cume_pt_atrisk = cumsum(population)) %>%
+    filter(date == max(date)) %>%
+    mutate(
+        avg_n_prov = round(cume_pt_atrisk / N_MONTHS),
+        fitted_per100k = fitted / cume_pt_atrisk * 100000 * 12,
+        upper_per100k  = upper  / cume_pt_atrisk * 100000 * 12,
+        lower_per100k  = lower  / cume_pt_atrisk * 100000 * 12
+    ) %>%
+    left_join(death_df) %>%
+    mutate(
+        expected = n_deaths - fitted,
+        expected_lower = n_deaths - upper,
+        expected_upper = n_deaths - lower
+    ) %>%
+    ungroup() %>% 
+    left_join(
+        cume_df %>%
+            group_by(death_type, age_grp, active_grp) %>%
+            summarize(sd_n_prov = sd(population))
+    )
+```
+
+## Table 1. Observed, Expected, and Excess Mortality
+
+```{r printtable1}
+print_table <- cume_summary %>%
+    filter(age_grp != "under45",
+           age_grp != "85andup",
+           active_grp != "all",
+           active_grp != "active") %>%
+    transmute(
+        age_cat,
+        active_cat,
+        avg_sd_n_prov = sprintf("%s (%0.1f)", 
+                                prettyNum(avg_n_prov, big.mark = ","),
+                                round(sd_n_prov, 1)), 
+        n_deaths = prettyNum(n_deaths, big.mark = ","), 
+        expected_deaths = sprintf(
+            "%s (%s to %s)",
+            prettyNum(round(expected), big.mark = ","),
+            prettyNum(round(expected_lower), big.mark = ","),
+            prettyNum(round(expected_upper), big.mark = ",")
+        ),
+        excess_deaths = sprintf(
+            "%s (%s to %s)",
+            prettyNum(round(fitted), big.mark = ","),
+            prettyNum(round(lower), big.mark = ","),
+            prettyNum(round(upper), big.mark = ",")
+        )
+    )
+```
+
+```{r table1}
+print_table %>%
+    kable(row.names = FALSE, 
+          col.names = c(
+              "Age group (years)",
+              "Type of practice",
+              "Mean No. Monthly Physicians (SD)",
+              "No. observed deaths",
+              "No. expected deaths (95% CI)",
+              "No. excess deaths (95% CI)"
+          ), 
+          format = "html")  %>%
+    kable_classic(full_width = TRUE, html_font = "Cambria") 
+```
+
+## Table S1. Full Results
+
+```{r}
+## Summarize genpop cumulative excess deaths ----
+## Take the weekly population count as our person-time at risk. Then the 
+## cumulative weekly population counts are our cumulative person-weeks at
+## risk and we can annualize it by scaling it 365.25/7 (weeks per year) over the 
+## number of weeks observed. 
+N_WEEKS <- n_distinct(genpop_cume$date)
+
+genpop_summary <- genpop_cume %>%
+    group_by(death_type, age_grp, active_grp) %>%
+    arrange(death_type, age_cat, active_cat, date) %>%
+    mutate(cume_pt_atrisk = cumsum(pop),
+           n_deaths = cumsum(n_deaths)) %>%
+    filter(date == max(date)) %>%
+    mutate(
+        avg_n_prov = round(cume_pt_atrisk / N_WEEKS),
+        fitted_per100k = fitted / cume_pt_atrisk * 100000 * 365.25/7,
+        upper_per100k  = upper  / cume_pt_atrisk * 100000 * 365.25/7,
+        lower_per100k  = lower  / cume_pt_atrisk * 100000 * 365.25/7
+    ) %>%
+    mutate(
+        expected = n_deaths - fitted,
+        expected_lower = n_deaths - upper,
+        expected_upper = n_deaths - lower, 
+    ) %>%
+    ungroup()
+```
+
+
+```{r printtables1}
+print_table <- cume_summary %>% 
+    bind_rows(genpop_summary) %>% 
+    # filter(age_grp != "under45",
+    #        age_grp != "85andup") %>% 
+    arrange(death_type, age_cat, active_cat) %>%
+    transmute(
+        age_cat,
+        active_cat,
+      avg_sd_n_prov = sprintf("%s (%0.1f)", 
+                                prettyNum(avg_n_prov, big.mark = ","),
+                                round(sd_n_prov, 1)), 
+        n_deaths = prettyNum(n_deaths, big.mark = ","),
+        expected_deaths = sprintf(
+            "%s (%s to %s)",
+            prettyNum(round(expected), big.mark = ","),
+            prettyNum(round(expected_lower), big.mark = ","),
+            prettyNum(round(expected_upper), big.mark = ",")
+        ),
+        excess_deaths = sprintf(
+            "%s (%s to %s)",
+            prettyNum(round(fitted), big.mark = ","),
+            prettyNum(round(lower), big.mark = ","),
+            prettyNum(round(upper), big.mark = ",")
+        ),
+        excess_per100k = sprintf(
+            "%0.2f (%0.2f to %0.2f)",
+            round(fitted_per100k, 2),
+            round(lower_per100k, 2),
+            round(upper_per100k, 2)
+        )
+    )
+```
+
+```{r tables1}
+print_table %>%
+    DT::datatable(rownames = FALSE, 
+          colnames = c(
+              "Age group (years)",
+              "Type of practice",
+             "Mean No. Monthly Physicians (SD)",
+              "Observed deaths (N)",
+              "Expected deaths (95% CI)",
+              "Excess deaths (95% CI)",
+              "Excess deaths per 100,000 person-years"
+          ), 
+          filter = "top") 
+```
+
+## Table S2. Average deaths, person-time, by age and active status
+
+```{r}
+death_full <- readRDS(here("data", "analytic_monthly.RDS")) %>%
+    filter(
+        !is.na(age_grp),
+        age_grp != "all",
+        race_grp == "all",
+        img_grp == "all",
+        spec_grp == "all",
+        death_type == "all_cause"
+    ) %>%
+    categorize_active() %>% 
+    categorize_age() %>% 
+    arrange(race_grp, img_grp, spec_grp, death_type, age_grp, date_start) %>% 
+    group_by(age_grp, active_grp, age_cat, active_cat)
+```
+
+```{r}
+bind_rows(
+    death_full %>%
+        summarize(
+            mean_deaths = mean(n_deaths),
+            mean_pop = mean(n_pop),
+            mean_crude_rate = mean(n_deaths / n_pop * 100000),
+            n_months = n_distinct(date_start),
+            time_period = sprintf("%s to %s", min(date_start), max(date_end)),
+        ) %>%
+        mutate(time = "full"),
+    death_full %>%
+        filter(date_start < as.Date("2020-03-01")) %>%
+        summarize(
+            mean_deaths = mean(n_deaths),
+            mean_pop = mean(n_pop),
+            mean_crude_rate = mean(n_deaths / n_pop * 100000),
+            n_months = n_distinct(date_start),
+            time_period = sprintf("%s to %s", min(date_start), max(date_end)),
+        ) %>%
+        mutate(time = "precovid"),
+    death_full %>%
+        filter(date_start >= as.Date("2020-03-01")) %>%
+        summarize(
+            mean_deaths = mean(n_deaths),
+            mean_pop = mean(n_pop),
+            mean_crude_rate = mean(n_deaths / n_pop * 100000),
+            n_months = n_distinct(date_start),
+            time_period = sprintf("%s to %s", min(date_start), max(date_end)),
+        ) %>%
+        mutate(time = "covid")
+) %>%
+    ungroup() %>%
+    transmute(
+        time = factor(
+            time,
+            levels = c("full", "precovid", "covid"),
+            labels = c("Full Time Period", "Pre-COVID", "COVID"),
+            ordered = TRUE
+        ),
+        time_period,
+        age_cat,
+        active_cat,
+        mean_deaths = round(mean_deaths, 2),
+        mean_pop = prettyNum(mean_pop, big.mark = ","),
+        mean_crude_rate = round(mean_crude_rate, 2),
+        n_months
+    )  %>%
+    arrange(time, age_cat, active_cat) %>%
+    DT::datatable(
+        rownames = FALSE,
+        colnames = c(
+            "Time period",
+            "Date range",
+            "Age group (years)",
+            "Type of practice",
+            "Average monthly deaths",
+            "Average monthly population",
+            "Average monthly crude rate (per 100,000)",
+            "Months of Observation"
+        ),
+        filter = "top"
+    ) 
+```
