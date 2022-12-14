@@ -1,0 +1,41 @@
+age_cat,active_cat,model_type,fitted,lower,upper
+45 to 64,"Active physician, provides
+direct patient care",Dynamic harmonic regression (ARIMA),39.33648217303417,-11.47944394558529,90.06228427258854
+45 to 64,"Active physician, provides
+direct patient care",Primary model (Poisson),81.28335477276856,26.814404723305444,135.75230482223168
+45 to 64,"Active physician, does not
+provide direct patient care",Dynamic harmonic regression (ARIMA),54.42424732051426,25.54153372375828,83.23900045954632
+45 to 64,"Active physician, does not
+provide direct patient care",Primary model (Poisson),13.350964257687886,0.7515298946034878,25.950398620772283
+45 to 64,Non-active physician,Dynamic harmonic regression (ARIMA),33.15262485398135,15.084642681575586,51.03429888515691
+45 to 64,Non-active physician,Primary model (Poisson),11.411152602201009,-2.589183931847847,25.411489136249862
+65 to 74,"Active physician, provides
+direct patient care",Dynamic harmonic regression (ARIMA),128.27214688027644,73.26434384415323,183.2306702955538
+65 to 74,"Active physician, provides
+direct patient care",Primary model (Poisson),107.59483231821623,51.84412618754555,163.3455384488869
+65 to 74,"Active physician, does not
+provide direct patient care",Dynamic harmonic regression (ARIMA),-11.928177602288352,-28.39649244405759,4.353934613174356
+65 to 74,"Active physician, does not
+provide direct patient care",Primary model (Poisson),-8.061720908458533,-28.820054993667366,12.6966131767503
+65 to 74,Non-active physician,Dynamic harmonic regression (ARIMA),27.77107242879069,-21.77066315666011,77.20918355178263
+65 to 74,Non-active physician,Primary model (Poisson),91.36747130947872,46.399811676486365,136.33513094247107
+75 to 84,"Active physician, provides
+direct patient care",Dynamic harmonic regression (ARIMA),118.53807800514187,92.94641886600326,144.08338437762077
+75 to 84,"Active physician, provides
+direct patient care",Primary model (Poisson),85.3581079629382,45.89585311551932,124.8203628103571
+75 to 84,"Active physician, does not
+provide direct patient care",Dynamic harmonic regression (ARIMA),-21.974822299616342,-43.14464595463949,-0.8367978576572209
+75 to 84,"Active physician, does not
+provide direct patient care",Primary model (Poisson),10.247092465955637,-11.823788230198472,32.317973162109745
+75 to 84,Non-active physician,Dynamic harmonic regression (ARIMA),251.42011023132437,131.9613464432262,370.94410870419415
+75 to 84,Non-active physician,Primary model (Poisson),227.87845182912386,134.21405342733348,321.54285023091427
+All (45 to 84),"Active physician, provides
+direct patient care",Dynamic harmonic regression (ARIMA),317.7767957580175,193.6834953197284,442.54219086399337
+All (45 to 84),"Active physician, provides
+direct patient care",Primary model (Poisson),284.9838617701057,191.80916605937378,378.15855748083766
+All (45 to 84),"Active physician, does not
+provide direct patient care",Dynamic harmonic regression (ARIMA),30.95893905943978,3.8419550850999604,57.972811656845
+All (45 to 84),"Active physician, does not
+provide direct patient care",Primary model (Poisson),24.095901282289,-8.223523972273185,56.41532653685118
+All (45 to 84),Non-active physician,Dynamic harmonic regression (ARIMA),207.00305304429452,27.520794174733037,387.54473416898566
+All (45 to 84),Non-active physician,Primary model (Poisson),360.6685992781774,255.35394467015263,465.9832538862022
