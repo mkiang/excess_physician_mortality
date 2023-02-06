@@ -9,16 +9,17 @@ This repository,
 [`excess_physician_mortality`](https://github.com/mkiang/excess_physician_mortality),
 contains reproducible code for our open-access *JAMA Internal Medicine*
 research letter, [“Excess mortality among US physicians during the
-COVID-19 pandemic”](TODO), which uses [data from the American Medical
-Association
+COVID-19
+pandemic”](https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2800889),
+which uses [data from the American Medical Association
 (AMA)](https://www.ama-assn.org/about/masterfile/ama-physician-masterfile)
-to estimate [excess mortality](https://github.com/rafalab/excessmort)
+to [estimate excess mortality](https://github.com/rafalab/excessmort)
 among US physicians during the COVID-19 pandemic. The full citation is:
 
 > Kiang MV, Carlasare LE, Thadaney Israni S, Norcini JJ, Zaman JAB,
 > Bibbins-Domingo K. Excess mortality among US physicians during the
 > COVID-19 pandemic. *JAMA Internal Medicine*. Published online February
-> 6, 2023. <doi:10.1001/jamainternmed.2022.6308>.
+> 6, 2023. doi: 10.1001/jamainternmed.2022.6308
 
 ## About this repository
 
