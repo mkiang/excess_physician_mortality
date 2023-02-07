@@ -16,10 +16,11 @@ which uses [data from the American Medical Association
 to [estimate excess mortality](https://github.com/rafalab/excessmort)
 among US physicians during the COVID-19 pandemic. The full citation is:
 
-> Kiang MV, Carlasare LE, Thadaney Israni S, Norcini JJ, Zaman JAB,
-> Bibbins-Domingo K. Excess mortality among US physicians during the
-> COVID-19 pandemic. *JAMA Internal Medicine*. Published online February
-> 6, 2023. doi: 10.1001/jamainternmed.2022.6308
+> Kiang MV, Carlasare LE, Israni ST, Norcini J, Zaman JAB,
+> Bibbins-Domingo K, Excess mortality among US physicians during the
+> COVID-19 pandemic. *JAMA Internal Medicine*. 2023 Feb 6;. doi:
+> 10.1001/jamainternmed.2022.6308. \[Epub ahead of print\] PubMed PMID:
+> 36745424.
 
 ## About this repository
 
